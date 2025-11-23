@@ -10,10 +10,22 @@ const STORAGE_KEY_API = 'estudemais_api_key';
  */
 const getGenAIClient = (passedKey?: string): GoogleGenAI => {
   const localKey = localStorage.getItem(STORAGE_KEY_API);
-  const envKey = process.env.API_KEY;
-  
+  // Safe access to process.env for browser environments
+  let envKey = '';
+  try {
+    // @ts-ignore
+    if (typeof process !== 'undefined' && process.env) {
+      // @ts-ignore
+      envKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+    } else if (typeof import.meta !== 'undefined' && import.meta.env) {
+      envKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+    }
+  } catch (e) {
+    console.warn("Could not access env vars", e);
+  }
+
   const apiKey = passedKey || localKey || envKey;
-  
+
   if (!apiKey) {
     throw new Error("API Key não configurada. Por favor, adicione sua chave nas configurações.");
   }
@@ -37,10 +49,10 @@ export const streamAnalysisResponse = async (
 
     // 1. Add files to the request
     files.forEach((file) => {
-      const base64Data = file.data.includes(',') 
-        ? file.data.split(',')[1] 
+      const base64Data = file.data.includes(',')
+        ? file.data.split(',')[1]
         : file.data;
-      
+
       if (base64Data) {
         parts.push({
           inlineData: {
@@ -53,7 +65,7 @@ export const streamAnalysisResponse = async (
 
     // 2. Construct text prompt with context
     let contextPrompt = "";
-    
+
     if (history.length > 0) {
       contextPrompt += "Histórico da conversa:\n";
       history.forEach(msg => {
@@ -93,7 +105,7 @@ export const streamAnalysisResponse = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     const msg = error.message || "Falha ao analisar documentos.";
-    
+
     if (msg.includes("API Key")) {
       throw new Error("API Key inválida ou ausente. Verifique as configurações.");
     }
