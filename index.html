@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESTUDE MAIS</title>
+  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366f1',
+            secondary: '#4f46e5',
+            dark: '#0f172a',
+            darker: '#020617',
+            surface: '#1e293b',
+          }
+        }
+      }
+    }
+  </script>
+
+
+</head>
+
+<body class="bg-darker text-slate-200 h-screen w-screen overflow-hidden">
+  <div id="error-display"
+    style="display:none; position:fixed; top:0; left:0; width:100%; background:red; color:white; padding:20px; z-index:9999; overflow-y:auto; max-height:50vh;">
+  </div>
+  <script>
+    window.onerror = function (msg, url, line, col, error) {
+      var div = document.getElementById('error-display');
+      div.style.display = 'block';
+      div.innerHTML += '<strong>Error:</strong> ' + msg + '<br>' + (url || '') + ':' + (line || '') + ':' + (col || '') + '<br><hr>';
+    };
+    window.addEventListener('unhandledrejection', function (event) {
+      var div = document.getElementById('error-display');
+      div.style.display = 'block';
+      div.innerHTML += '<strong>Promise Rejection:</strong> ' + event.reason + '<br><hr>';
+    });
+  </script>
+  <div id="root" class="h-full w-full"></div>
+  <script type="module" src="./index.tsx"></script>
+</body>
+
+</html>
